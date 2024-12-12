@@ -15,17 +15,19 @@ export default function SignUp() {
     password: '',
     phone: ''
   });
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
       const result = await authService.signup(formData);
-      if (result.message === 'User created successfully') {
-        navigate('/welcome', { state: { name: formData.name } });
+      if (result.user) {
+        navigate('/welcome', { state: { userName: formData.name } });
       }
-    } catch (error) {
-      setErrors({ submit: error.message });
+    } catch (err) {
+      setError(err.message || 'Erreur lors de l\'inscription');
     }
   };
 
@@ -35,55 +37,49 @@ export default function SignUp() {
       <main className="pt-20 flex justify-center items-center min-h-screen">
         <Card className="w-full max-w-md p-8">
           <h2 className="text-white text-3xl font-bold mb-6 text-center">Inscription</h2>
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded text-red-500 text-center">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input 
               label="Nom"
               type="text"
-              placeholder="Jean Dupont"
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
-              error={errors.name}
               required
             />
             <Input 
               label="Email"
               type="email"
-              placeholder="jean@exemple.fr"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
-              error={errors.email}
               required
             />
             <Input 
               label="Mot de passe"
               type="password"
-              placeholder="••••••••"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
-              error={errors.password}
               required
             />
             <Input 
               label="Téléphone"
               type="tel"
-              placeholder="+33 6 12 34 56 78"
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              error={errors.phone}
               required
             />
-            <Button variant="primary" type="submit" className="w-full">
+            <Button type="submit" className="w-full">
               S'inscrire
             </Button>
-            {errors.submit && (
-              <div className="p-3 bg-red-500/10 border border-red-500/50 rounded text-red-500 text-center">
-                {errors.submit}
-              </div>
-            )}
             <div className="text-center mt-4">
               <p className="text-gray-400">
                 Déjà un compte ?{' '}
-                <Link to="/login" className="text-[#703BF7] hover:text-[#5f32d1]">
+                <Link to="/connexion" className="text-[#703BF7] hover:text-[#5f32d1]">
                   Se connecter
                 </Link>
               </p>
